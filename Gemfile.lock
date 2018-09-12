@@ -15,9 +15,19 @@ GEM
     arel (7.1.4)
     coderay (1.1.1)
     concurrent-ruby (1.0.5)
+    faraday (0.9.2)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.2)
+      faraday (>= 0.7.4, < 0.10)
+    hashie (3.6.0)
     i18n (0.8.1)
+    marvel_api (0.2.1)
+      faraday (>= 0.7, < 0.10)
+      faraday_middleware (>= 0.8, < 0.10)
+      hashie (>= 0.4.0)
     method_source (0.8.2)
     minitest (5.10.1)
+    multipart-post (2.0.0)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -44,10 +54,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  marvel_api
   pry
   require_all
   sinatra-activerecord
   sqlite3
 
 BUNDLED WITH
-   1.14.6
+   1.16.3
