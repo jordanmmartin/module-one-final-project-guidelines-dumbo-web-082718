@@ -138,7 +138,7 @@ def run_game
 end
 
 #Home Screen
-end_game = 4
+end_game = 5
 status = 0
 while status < end_game
 case status
@@ -165,12 +165,14 @@ when 0
     # new_user = User.create(new_name, new_username)
     #create row in user table
     #set local variable for user_id
+    stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game Go\ Home))
     status = 1
   when "Existing User"
     puts "Welcome back! What is your username?"
     username = gets.chomp.downcase
     #find user_id by entering username
     #set local variable for user_id
+    stats_or_game = prompt.select("What would you like to do?", %w(Play\ New\ Game See\ Stats Go\ Home))
     status = 1
   when "Quit"
     status = end_game
@@ -180,7 +182,7 @@ when 1
   # puts "See Stats (Y)"
   # puts "Play new Game (N)"
   # stats_or_game = gets.chomp.downcase
-  stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game))
+  # stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game))
   # while valid_user_input(stats_or_game) == false
   #   puts "What would you like to do?"
   #   puts "See Stats (Y)"
@@ -198,25 +200,44 @@ when 1
     puts "Correct Guesses: #{}"
     puts "Incorrect Guesses: #{}"
     puts "Percentage Correct: #{}%"
-    stats_input = prompt.select("What would you like to do?", %w(Play\ New\ Game Change\ Name Delete\ Account))
+    stats_input = prompt.select("What would you like to do?", %w(Play\ New\ Game Change\ Name Delete\ Account Go\ Home))
     case stats_input
     when "Play New Game"
       status = 2
     when "Change Name"
     when "Delete Account"
+    when "Go Home"
+      status = 0
     end
   when "Play New Game"
     status = 2
-    # puts "One moment..."
-    # run_game
-    # status = 2
+  when "Go Home"
+    status = 0
+  # when "Play New Game"
+  #   status = 2
+  #   # puts "One moment..."
+  #   # run_game
+  #   # status = 2
+  # when "Go Home"
+  #   status = 0
   end
 when 2
   puts "One moment..."
   run_game
   status = 3
 when 3
-
+  end_game_input = prompt.select("What would you like to do?", %w(Play\ Again See\ Stats Go\ Home Quit))
+  case end_game_input
+  when "Play Again"
+    status = 2
+  when "See Stats"
+    status = 1
+    stats_or_game = "See Stats"
+  when "Go Home"
+    status = 0
+  when "Quit"
+    status = end_game
+  end
 end
 end
 
