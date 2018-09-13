@@ -1,6 +1,8 @@
 require_relative '../config/environment'
 require_relative 'constants'
 
+prompt = TTY::Prompt.new
+
 require 'pry'
 
 #Helper Methods
@@ -142,43 +144,52 @@ while status < end_game
 case status
 when 0
   puts "Welcome to Marvel Hangman!"
-  puts "Are you new user? (Y/N)?"
-  new_user_answer = gets.chomp.downcase
-  while valid_user_input(new_user_answer) == false
-    puts "Are you new user? (Y/N)?"
-    new_user_answer = gets.chomp.downcase
-  end
+
+  new_user_answer = prompt.select("Choose One:", %w(New\ User Existing\ User Quit))
+
+  # puts "Are you new user? (Y/N)?"
+  # new_user_answer = gets.chomp.downcase
+  # while valid_user_input(new_user_answer) == false
+  #   puts "Are you new user? (Y/N)?"
+  #   new_user_answer = gets.chomp.downcase
+  # end
   case new_user_answer
-  when "y"
+  when "New User"
     puts "Welcome new user!"
-    puts "What is your name?"
-    new_name = gets.chomp.downcase
-    puts "Hello, #{new_name}! Please type in a user name:"
-    new_username = gets.chomp.downcase
-    new_user = User.create(new_name, new_username)
+    # puts "What is your name?"
+    # new_name = gets.chomp.downcase
+    new_name = prompt.ask('What is your name?')
+    # puts "Hello, #{new_name}! Please type in a user name:"
+    # new_username = gets.chomp.downcase
+    new_username = prompt.ask("Hello, #{new_name}! Please type in a user name:")
+    # new_user = User.create(new_name, new_username)
     #create row in user table
     #set local variable for user_id
-  when "n"
+    status = 1
+  when "Existing User"
     puts "Welcome back! What is your username?"
     username = gets.chomp.downcase
     #find user_id by entering username
     #set local variable for user_id
+    status = 1
+  when "Quit"
+    status = end_game
   end
-  status = 1
 when 1
-  puts "What would you like to do?"
-  puts "See Stats (Y)"
-  puts "Play new Game (N)"
-  stats_or_game = gets.chomp.downcase
-  while valid_user_input(stats_or_game) == false
-    puts "What would you like to do?"
-    puts "See Stats (Y)"
-    puts "Play new Game (N)"
-    stats_or_game = gets.chomp.downcase
-  end
+  # puts "What would you like to do?"
+  # puts "See Stats (Y)"
+  # puts "Play new Game (N)"
+  # stats_or_game = gets.chomp.downcase
+  stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game))
+  # while valid_user_input(stats_or_game) == false
+  #   puts "What would you like to do?"
+  #   puts "See Stats (Y)"
+  #   puts "Play new Game (N)"
+  #   stats_or_game = gets.chomp.downcase
+  # end
 
   case stats_or_game
-  when "y"
+  when "See Stats"
     #displaying stats for specific user id
     puts "Games Won: #{}"
     puts "Games Lost #{}"
@@ -187,11 +198,25 @@ when 1
     puts "Correct Guesses: #{}"
     puts "Incorrect Guesses: #{}"
     puts "Percentage Correct: #{}%"
-  when "n"
-    puts "One moment..."
-    run_game
+    stats_input = prompt.select("What would you like to do?", %w(Play\ New\ Game Change\ Name Delete\ Account))
+    case stats_input
+    when "Play New Game"
+      status = 2
+    when "Change Name"
+    when "Delete Account"
+    end
+  when "Play New Game"
+    status = 2
+    # puts "One moment..."
+    # run_game
+    # status = 2
   end
-  status = 0
+when 2
+  puts "One moment..."
+  run_game
+  status = 3
+when 3
+
 end
 end
 

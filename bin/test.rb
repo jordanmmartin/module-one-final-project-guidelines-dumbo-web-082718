@@ -1,8 +1,10 @@
+require_relative '../config/environment'
 require 'pry'
 require_relative 'constants'
+prompt = TTY::Prompt.new
 # alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
 # "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-guesses = ["a", "b", "c"]
+# guesses = ["a", "b", "c"]
 # guesses = []
 # num_wrong = 0
 # num_right = 0
@@ -39,5 +41,4 @@ guesses = ["a", "b", "c"]
 # puts "Number of Wrong Guesses: #{num_wrong}"
 # puts "Number of Right Guesses: #{num_right}"
 
-binding.pry
-0
+prompt.select("Choose One:", %w(New\ User Existing\ User))
