@@ -20,7 +20,8 @@ end
 
 character = split_characters_array.uniq.sample
 character_display_key = character.split(//)
-character_answer_key = character_display_key.select {|char| ALPHABET.include?(char)}
+character_display_key_downcase = character.downcase.split(//)
+character_answer_key = character_display_key_downcase.select {|char| ALPHABET.include?(char)}
 
 
 character_name_blank_spaces = character_answer_key.map do |char|
@@ -60,15 +61,21 @@ end
 
 
 
-character_name_blank_spaces.each do |char|
-  print char
-end
+# character_name_blank_spaces.each do |char|
+#   print char
+# end
 
 num_incorrect = 0
 num_correct = 0
 while (character_answer_key - guesses).any?
   if num_incorrect < 6
+    #displaying hangman
     puts HANGMAN_PICS[image_index]
+    #displaying blank spaces
+    character_name_blank_spaces.each do |char|
+      print char
+    end
+    #display previous guesses
     guesses.uniq.each do |char|
       if char == guesses.uniq.first
         print "\nPrevious Guesses: #{char}"
@@ -85,14 +92,13 @@ while (character_answer_key - guesses).any?
     if validate(guess, guesses)
         if character_answer_key.include?(guess)
           num_correct += 1
-          #display same hangman
           #display updated blank spaces
-          #display updated guesses
+          update_index = character_answer_key.index(guess)
+          character_name_blank_spaces[update_index] = character_display_key[update_index]
         else
           num_incorrect += 1
-          image_index += 1 #display updated hangman
+          image_index += 1
           #display same blank spaces
-          # display updated guesses
         end
         guesses << guess
         #displaying guesses
