@@ -114,6 +114,11 @@ def run_game
             image_index += 1
           end
           guesses << guess
+            if (character_answer_key - guesses).empty?
+              puts "YOU WON!"
+              puts "The answer was: #{character}."
+              break
+            end
       end
     else
       puts HANGMAN_PICS[image_index]
@@ -122,8 +127,6 @@ def run_game
       #save data from game into user_game and user tables
       break
     end
-    puts "YOU WON!"
-    puts "The answer was: #{character}."
   end
 end
 
@@ -139,14 +142,29 @@ case new_user_answer
 when "y"
   puts "Welcome new user!"
   puts "What is your name?"
-  name = gets.chomp.downcase
-  puts "Hello, #{name}! Please type in a user name:"
-  username = gets.chomp.downcase
-  user = User.new(name, username)
+  new_name = gets.chomp.downcase
+  puts "Hello, #{new_name}! Please type in a user name:"
+  new_username = gets.chomp.downcase
+  new_user = User.create(new_name, new_username)
+  #create row in user table
 when "n"
-
+  puts "Welcome back! What is your username?"
+  username = gets.chomp.downcase
+  #find user_id by entering username
 else
 end
+
+puts "What would you like to do?"
+puts "See Stats (Y)"
+puts "Play new Game (N)"
+stats_or_game = gets.chomp.downcase
+while valid_user_input(stats_or_game) == false
+  puts "What would you like to do?"
+  puts "See Stats (Y)"
+  puts "Play new Game (N)"
+  stats_or_game = gets.chomp.downcase
+end
+
 
 
 
