@@ -24,7 +24,7 @@ character_display_key_downcase = character.downcase.split(//)
 character_answer_key = character_display_key_downcase.select {|char| ALPHABET.include?(char)}
 
 
-character_name_blank_spaces = character_answer_key.map do |char|
+character_name_blank_spaces = character_display_key_downcase.map do |char|
   if ALPHABET.include?(char)
     char = "_"
   else
@@ -93,8 +93,18 @@ while (character_answer_key - guesses).any?
         if character_answer_key.include?(guess)
           num_correct += 1
           #display updated blank spaces
-          update_index = character_answer_key.index(guess)
-          character_name_blank_spaces[update_index] = character_display_key[update_index]
+          update_index = 0
+          update_index_array = []
+          character_display_key_downcase.each do |char|
+            if char == guess
+              update_index_array << update_index
+            end
+            update_index += 1
+          end
+
+          update_index_array.each do |index|
+            character_name_blank_spaces[index] = character_display_key[index]
+          end
         else
           num_incorrect += 1
           image_index += 1
@@ -117,12 +127,15 @@ while (character_answer_key - guesses).any?
   else
     puts HANGMAN_PICS[image_index]
     puts "Sorry, you lost."
+    puts "The answer was: #{character}."
     #save data from game into user_game and user tables
     break
   end
+  puts "YOU WON!"
+  puts "The answer was: #{character}."
 end
 
-puts "Answer: #{character_answer_key}"
-puts "Guesses: #{guesses}"
+# puts "Answer: #{character_answer_key}"
+# puts "Guesses: #{guesses}"
 puts "Number of Wrong Guesses: #{num_incorrect}"
 puts "Number of Right Guesses: #{num_correct}"
