@@ -43,7 +43,7 @@ def valid_user_input(user_input)
 end
 
 #method to start new game
-def run_game
+def run_game(user_id, user)
   #Accessing Marvel Api to get a single character name
   prng = Random.new
   characters_array = []
@@ -74,6 +74,9 @@ def run_game
 
 
   #New Game running
+  game = Game.create
+  game_id = game.id
+  usergame = UserGame.create(user_id: user_id, game_id: game_id)
   guesses = []
   image_index = 0
   num_incorrect = 0
@@ -124,6 +127,8 @@ def run_game
               puts "YOU WON!"
               #add another hangman pic and add filled blank spaces
               puts "The answer was: #{character}."
+              usergame.user_win = true
+              user.number_wins += 1
               break
             end
       end
@@ -131,10 +136,20 @@ def run_game
       puts HANGMAN_PICS[image_index]
       puts "Sorry, you lost."
       puts "The answer was: #{character}."
+      puts "Number of Wrong Guesses: #{num_incorrect}"
+      puts "Number of Right Guesses: #{num_correct}"
       #save data from game into user_game and user tables
+      usergame.user_win = false
+      user.number_losses += 1
       break
     end
   end
+  usergame.correct_guesses = num_correct
+  usergame.incorrect_guesses = num_incorrect
+  user.total_correct_guesses += num_correct
+  user.total_incorrect_guesses += num_incorrect
+  usergame.save
+  user.save
 end
 
 #Home Screen
@@ -147,59 +162,63 @@ when 0
 
   new_user_answer = prompt.select("Choose One:", %w(New\ User Existing\ User Quit))
 
-  # puts "Are you new user? (Y/N)?"
-  # new_user_answer = gets.chomp.downcase
-  # while valid_user_input(new_user_answer) == false
-  #   puts "Are you new user? (Y/N)?"
-  #   new_user_answer = gets.chomp.downcase
-  # end
+
   case new_user_answer
   when "New User"
     puts "Welcome new user!"
-    # puts "What is your name?"
-    # new_name = gets.chomp.downcase
-    new_name = prompt.ask('What is your name?')
-    # puts "Hello, #{new_name}! Please type in a user name:"
-    # new_username = gets.chomp.downcase
-    new_username = prompt.ask("Hello, #{new_name}! Please type in a user name:")
+    new_name = prompt.ask('What is your name?').downcase
+    new_username = prompt.ask("Hello, #{new_name.capitalize}! Please type in a user name:").downcase
+    #double check not exisiting user
+      user = User.find_or_create_by(username: new_username, name: new_name)
+      if user.number_wins == nil || user.number_losses == nil || user.total_correct_guesses == nil || user.total_incorrect_guesses == nil
+        user.number_wins = 0
+        user.number_losses = 0
+        user.total_correct_guesses = 0
+        user.total_incorrect_guesses = 0
+        user.save
+      end
+      user_id = user.id
     # new_user = User.create(new_name, new_username)
     #create row in user table
     #set local variable for user_id
     stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game Go\ Home))
     status = 1
   when "Existing User"
-    puts "Welcome back! What is your username?"
-    username = gets.chomp.downcase
+    username = prompt.ask('What is your username?').downcase
+    user = User.find_by(username: username)
+    if user == nil
+      puts "No user with that user name found."
+      status = 0
+    else
+    user_id = user.id
     #find user_id by entering username
     #set local variable for user_id
     stats_or_game = prompt.select("What would you like to do?", %w(Play\ New\ Game See\ Stats Go\ Home))
     status = 1
+    end
   when "Quit"
     status = end_game
   end
 when 1
-  # puts "What would you like to do?"
-  # puts "See Stats (Y)"
-  # puts "Play new Game (N)"
-  # stats_or_game = gets.chomp.downcase
-  # stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game))
-  # while valid_user_input(stats_or_game) == false
-  #   puts "What would you like to do?"
-  #   puts "See Stats (Y)"
-  #   puts "Play new Game (N)"
-  #   stats_or_game = gets.chomp.downcase
-  # end
-
   case stats_or_game
   when "See Stats"
     #displaying stats for specific user id
-    puts "Games Won: #{}"
-    puts "Games Lost #{}"
-    puts "Percentage Won: #{}%"
+    games_won = user.number_wins
+    games_lost = user.number_losses
+    # percent_win = games_won / (games_won + games_lost) * 100
+    total_correct = user.total_correct_guesses
+    total_incorrect = user.total_incorrect_guesses
+    # percent_correct = total_correct / (total_correct + total_incorrect) * 100
+    name = user.name
+    puts "Your Name: #{name}"
+    puts "Your Username: #{username}"
+    puts "Games Won: #{games_won}"
+    puts "Games Lost: #{games_lost}"
+    # puts "Percentage Won: #{percent_win}%"
     puts "----------------------------"
-    puts "Correct Guesses: #{}"
-    puts "Incorrect Guesses: #{}"
-    puts "Percentage Correct: #{}%"
+    puts "Correct Guesses: #{total_correct}"
+    puts "Incorrect Guesses: #{total_incorrect}"
+    # puts "Percentage Correct: #{percent_correct}%"
     stats_input = prompt.select("What would you like to do?", %w(Play\ New\ Game Change\ Name Delete\ Account Go\ Home))
     case stats_input
     when "Play New Game"
@@ -213,17 +232,10 @@ when 1
     status = 2
   when "Go Home"
     status = 0
-  # when "Play New Game"
-  #   status = 2
-  #   # puts "One moment..."
-  #   # run_game
-  #   # status = 2
-  # when "Go Home"
-  #   status = 0
   end
 when 2
   puts "One moment..."
-  run_game
+  run_game(user_id, user)
   status = 3
 when 3
   end_game_input = prompt.select("What would you like to do?", %w(Play\ Again See\ Stats Go\ Home Quit))
@@ -240,7 +252,3 @@ when 3
   end
 end
 end
-
-
-# puts "Number of Wrong Guesses: #{num_incorrect}"
-# puts "Number of Right Guesses: #{num_correct}"
