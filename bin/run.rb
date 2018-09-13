@@ -1,16 +1,17 @@
 require_relative '../config/environment'
+require_relative 'constants'
 
 require 'pry'
+
+
 
 prng = Random.new
 characters_array = []
 offset = prng.rand(1...14) * 100
 
-# while offset < 1000
 @client.characters(limit: 100, offset: offset).each do |character|
   characters_array << character[:name]
 end
-
 
 split_characters_array = []
 characters_array.each do |character|
@@ -18,16 +19,104 @@ characters_array.each do |character|
 end
 
 character = split_characters_array.uniq.sample
-character_anser_key = character.split(//)
+character_display_key = character.split(//)
+character_answer_key = character_display_key.select {|char| ALPHABET.include?(char)}
+
+
+character_name_blank_spaces = character_answer_key.map do |char|
+  if ALPHABET.include?(char)
+    char = "_"
+  else
+    char
+  end
+end
 
 
 
 
+guesses = []
+image_index = 0
+
+def validate(guess, guesses)
+  if guess.length == 1
+    true
+    if ALPHABET.include?(guess)
+      true
+      if !guesses.include?(guess)
+        true
+      else
+        puts "You already guessed that."
+        false
+      end
+    else
+      puts "Invalid entry. Guess has to be a letter"
+      false
+    end
+  else
+    puts "Invalid! Guess can only by one character."
+    false
+  end
+end
 
 
 
-#   offset += 100
-# end
+character_name_blank_spaces.each do |char|
+  print char
+end
 
-# puts characters_array.count
-# binding.pry
+num_incorrect = 0
+num_correct = 0
+while (character_answer_key - guesses).any?
+  if num_incorrect < 6
+    puts HANGMAN_PICS[image_index]
+    guesses.uniq.each do |char|
+      if char == guesses.uniq.first
+        print "\nPrevious Guesses: #{char}"
+      elsif char == guesses.uniq[1]
+        print ", #{char}, "
+      elsif char == guesses.uniq.last
+        print "#{char}"
+      else
+        print "#{char}, "
+      end
+    end
+    puts "\nMake a guess:"
+    guess = gets.chomp.downcase
+    if validate(guess, guesses)
+        if character_answer_key.include?(guess)
+          num_correct += 1
+          #display same hangman
+          #display updated blank spaces
+          #display updated guesses
+        else
+          num_incorrect += 1
+          image_index += 1 #display updated hangman
+          #display same blank spaces
+          # display updated guesses
+        end
+        guesses << guess
+        #displaying guesses
+        # guesses.uniq.each do |char|
+        #   if char == guesses.uniq.first
+        #     print "\nPrevious Guesses: #{char}"
+        #   elsif char == guesses.uniq[1]
+        #     print ", #{char}, "
+        #   elsif char == guesses.uniq.last
+        #     print "#{char}"
+        #   else
+        #     print "#{char}, "
+        #   end
+        # end
+    end
+  else
+    puts HANGMAN_PICS[image_index]
+    puts "Sorry, you lost."
+    #save data from game into user_game and user tables
+    break
+  end
+end
+
+puts "Answer: #{character_answer_key}"
+puts "Guesses: #{guesses}"
+puts "Number of Wrong Guesses: #{num_incorrect}"
+puts "Number of Right Guesses: #{num_correct}"
