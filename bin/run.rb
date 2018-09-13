@@ -24,16 +24,19 @@ def validate(guess, guesses)
 end
 
 def valid_user_input(user_input)
-  if user_input.length == 1
-    if user_input == "y" || user_input == "n"
-      true
+  if user_input = "quit"
+    status = end_game
+    if user_input.length == 1
+      if user_input == "y" || user_input == "n"
+        true
+      else
+        puts "Invalid entry. Input has to be Y/N"
+        false
+      end
     else
-      puts "Invalid entry. Input has to be Y/N"
+      puts "Invalid! Input can only by one character(Y/N)."
       false
     end
-  else
-    puts "Invalid! Input can only by one character(Y/N)."
-    false
   end
 end
 
@@ -73,6 +76,7 @@ def run_game
   image_index = 0
   num_incorrect = 0
   num_correct = 0
+  puts "Let's Play!"
   while (character_answer_key - guesses).any?
     if num_incorrect < 6
       #displaying hangman
@@ -116,6 +120,7 @@ def run_game
           guesses << guess
             if (character_answer_key - guesses).empty?
               puts "YOU WON!"
+              #add another hangman pic and add filled blank spaces
               puts "The answer was: #{character}."
               break
             end
@@ -131,41 +136,64 @@ def run_game
 end
 
 #Home Screen
-puts "Welcome to Marvel Hangman!"
-puts "Are you new user? (Y/N)?"
-new_user_answer = gets.chomp.downcase
-while valid_user_input(new_user_answer) == false
+end_game = 4
+status = 0
+while status < end_game
+case status
+when 0
+  puts "Welcome to Marvel Hangman!"
   puts "Are you new user? (Y/N)?"
   new_user_answer = gets.chomp.downcase
-end
-case new_user_answer
-when "y"
-  puts "Welcome new user!"
-  puts "What is your name?"
-  new_name = gets.chomp.downcase
-  puts "Hello, #{new_name}! Please type in a user name:"
-  new_username = gets.chomp.downcase
-  new_user = User.create(new_name, new_username)
-  #create row in user table
-when "n"
-  puts "Welcome back! What is your username?"
-  username = gets.chomp.downcase
-  #find user_id by entering username
-else
-end
-
-puts "What would you like to do?"
-puts "See Stats (Y)"
-puts "Play new Game (N)"
-stats_or_game = gets.chomp.downcase
-while valid_user_input(stats_or_game) == false
+  while valid_user_input(new_user_answer) == false
+    puts "Are you new user? (Y/N)?"
+    new_user_answer = gets.chomp.downcase
+  end
+  case new_user_answer
+  when "y"
+    puts "Welcome new user!"
+    puts "What is your name?"
+    new_name = gets.chomp.downcase
+    puts "Hello, #{new_name}! Please type in a user name:"
+    new_username = gets.chomp.downcase
+    new_user = User.create(new_name, new_username)
+    #create row in user table
+    #set local variable for user_id
+  when "n"
+    puts "Welcome back! What is your username?"
+    username = gets.chomp.downcase
+    #find user_id by entering username
+    #set local variable for user_id
+  end
+  status = 1
+when 1
   puts "What would you like to do?"
   puts "See Stats (Y)"
   puts "Play new Game (N)"
   stats_or_game = gets.chomp.downcase
+  while valid_user_input(stats_or_game) == false
+    puts "What would you like to do?"
+    puts "See Stats (Y)"
+    puts "Play new Game (N)"
+    stats_or_game = gets.chomp.downcase
+  end
+
+  case stats_or_game
+  when "y"
+    #displaying stats for specific user id
+    puts "Games Won: #{}"
+    puts "Games Lost #{}"
+    puts "Percentage Won: #{}%"
+    puts "----------------------------"
+    puts "Correct Guesses: #{}"
+    puts "Incorrect Guesses: #{}"
+    puts "Percentage Correct: #{}%"
+  when "n"
+    puts "One moment..."
+    run_game
+  end
+  status = 0
 end
-
-
+end
 
 
 # puts "Number of Wrong Guesses: #{num_incorrect}"
