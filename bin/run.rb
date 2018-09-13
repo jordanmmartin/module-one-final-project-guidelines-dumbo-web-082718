@@ -25,7 +25,7 @@ end
 
 def valid_user_input(user_input)
   if user_input.length == 1
-    if user_input.downcase == "y" || user_input.downcase == "n"
+    if user_input == "y" || user_input == "n"
       true
     else
       puts "Invalid entry. Input has to be Y/N"
@@ -130,11 +130,25 @@ end
 #Home Screen
 puts "Welcome to Marvel Hangman!"
 puts "Are you new user? (Y/N)?"
-new_user_answer = gets.chomp
-while valid_user_input(new_user_answer) == true
+new_user_answer = gets.chomp.downcase
+while valid_user_input(new_user_answer) == false
   puts "Are you new user? (Y/N)?"
-  new_user_answer = gets.chomp
+  new_user_answer = gets.chomp.downcase
 end
+case new_user_answer
+when "y"
+  puts "Welcome new user!"
+  puts "What is your name?"
+  name = gets.chomp.downcase
+  puts "Hello, #{name}! Please type in a user name:"
+  username = gets.chomp.downcase
+  user = User.new(name, username)
+when "n"
+
+else
+end
+
+
 
 # puts "Number of Wrong Guesses: #{num_incorrect}"
 # puts "Number of Right Guesses: #{num_correct}"
