@@ -25,22 +25,22 @@ def validate(guess, guesses)
   end
 end
 
-def valid_user_input(user_input)
-  if user_input = "quit"
-    status = end_game
-    if user_input.length == 1
-      if user_input == "y" || user_input == "n"
-        true
-      else
-        puts "Invalid entry. Input has to be Y/N"
-        false
-      end
-    else
-      puts "Invalid! Input can only by one character(Y/N)."
-      false
-    end
-  end
-end
+# def valid_user_input(user_input)
+#   if user_input = "quit"
+#     status = end_game
+#     if user_input.length == 1
+#       if user_input == "y" || user_input == "n"
+#         true
+#       else
+#         puts "Invalid entry. Input has to be Y/N"
+#         false
+#       end
+#     else
+#       puts "Invalid! Input can only by one character(Y/N)."
+#       false
+#     end
+#   end
+# end
 
 #method to start new game
 def run_game(user_id, user)
@@ -158,7 +158,9 @@ status = 0
 while status < end_game
 case status
 when 0
+  puts "---------------------------"
   puts "Welcome to Marvel Hangman!"
+  puts "---------------------------"
 
   new_user_answer = prompt.select("Choose One:", %w(New\ User Existing\ User Quit))
 
@@ -181,7 +183,7 @@ when 0
     # new_user = User.create(new_name, new_username)
     #create row in user table
     #set local variable for user_id
-    stats_or_game = prompt.select("What would you like to do?", %w(See\ Stats Play\ New\ Game Go\ Home))
+    stats_or_game = prompt.select("What would you like to do?", %w(Play\ New\ Game See\ Stats Go\ Home))
     status = 1
   when "Existing User"
     username = prompt.ask('What is your username?').downcase
@@ -210,21 +212,36 @@ when 1
     total_incorrect = user.total_incorrect_guesses
     # percent_correct = total_correct / (total_correct + total_incorrect) * 100
     name = user.name
+    puts "----------------------------"
     puts "Your Name: #{name}"
     puts "Your Username: #{username}"
+    puts "----------------------------"
     puts "Games Won: #{games_won}"
     puts "Games Lost: #{games_lost}"
     # puts "Percentage Won: #{percent_win}%"
     puts "----------------------------"
     puts "Correct Guesses: #{total_correct}"
     puts "Incorrect Guesses: #{total_incorrect}"
+    puts "----------------------------"
     # puts "Percentage Correct: #{percent_correct}%"
     stats_input = prompt.select("What would you like to do?", %w(Play\ New\ Game Change\ Name Delete\ Account Go\ Home))
     case stats_input
     when "Play New Game"
       status = 2
     when "Change Name"
+      changed_name = prompt.ask('What would you like to change you name to:')
+      user.name = changed_name
+      puts "Your name has been successfully changed."
     when "Delete Account"
+      delete_account = prompt.select("Are you sure you want to delete your account?", %w(Yes No))
+      case delete_account
+      when "Yes"
+        user.destroy
+        puts "Your account has been successfully delete."
+        status = 0
+      when "No"
+        status 1
+      end
     when "Go Home"
       status = 0
     end
