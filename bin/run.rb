@@ -5,7 +5,7 @@ prompt = TTY::Prompt.new
 
 require 'pry'
 
-#Helper Methods
+#Helper method to validate user input during the game
 def validate(guess, guesses)
   if guess.length == 1
     if ALPHABET.include?(guess)
@@ -25,22 +25,6 @@ def validate(guess, guesses)
   end
 end
 
-# def valid_user_input(user_input)
-#   if user_input = "quit"
-#     status = end_game
-#     if user_input.length == 1
-#       if user_input == "y" || user_input == "n"
-#         true
-#       else
-#         puts "Invalid entry. Input has to be Y/N"
-#         false
-#       end
-#     else
-#       puts "Invalid! Input can only by one character(Y/N)."
-#       false
-#     end
-#   end
-# end
 
 #method to start new game
 def run_game(user_id, user)
@@ -62,7 +46,6 @@ def run_game(user_id, user)
   character_display_key = character.split(//)
   character_display_key_downcase = character.downcase.split(//)
   character_answer_key = character_display_key_downcase.select {|char| ALPHABET.include?(char)}
-
 
   character_name_blank_spaces = character_display_key_downcase.map do |char|
     if ALPHABET.include?(char)
@@ -124,9 +107,11 @@ def run_game(user_id, user)
           end
           guesses << guess
             if (character_answer_key - guesses).empty?
-              puts "YOU WON!"
+              puts WIN
               #add another hangman pic and add filled blank spaces
               puts "The answer was: #{character}."
+              puts "Number of Wrong Guesses: #{num_incorrect}"
+              puts "Number of Right Guesses: #{num_correct}"
               usergame.user_win = true
               user.number_wins += 1
               break
@@ -134,7 +119,7 @@ def run_game(user_id, user)
       end
     else
       puts HANGMAN_PICS[image_index]
-      puts "Sorry, you lost."
+      puts LOSE
       puts "The answer was: #{character}."
       puts "Number of Wrong Guesses: #{num_incorrect}"
       puts "Number of Right Guesses: #{num_correct}"
@@ -152,19 +137,18 @@ def run_game(user_id, user)
   user.save
 end
 
+
+
 #Home Screen
 end_game = 5
 status = 0
 while status < end_game
 case status
 when 0
-  puts "---------------------------"
-  puts "Welcome to Marvel Hangman!"
-  puts "---------------------------"
-
+  print "--------------------------------------------------"
+  puts WELCOME
+  puts "--------------------------------------------------"
   new_user_answer = prompt.select("Choose One:", %w(New\ User Existing\ User Quit))
-
-
   case new_user_answer
   when "New User"
     puts "Welcome new user!"
@@ -179,10 +163,7 @@ when 0
         user.total_incorrect_guesses = 0
         user.save
       end
-      user_id = user.id
-    # new_user = User.create(new_name, new_username)
-    #create row in user table
-    #set local variable for user_id
+    user_id = user.id
     stats_or_game = prompt.select("What would you like to do?", %w(Play\ New\ Game See\ Stats Go\ Home))
     status = 1
   when "Existing User"
@@ -193,8 +174,6 @@ when 0
       status = 0
     else
     user_id = user.id
-    #find user_id by entering username
-    #set local variable for user_id
     stats_or_game = prompt.select("What would you like to do?", %w(Play\ New\ Game See\ Stats Go\ Home))
     status = 1
     end
@@ -212,6 +191,7 @@ when 1
     total_incorrect = user.total_incorrect_guesses
     # percent_correct = total_correct / (total_correct + total_incorrect) * 100
     name = user.name
+    username = user.username
     puts "----------------------------"
     puts "Your Name: #{name}"
     puts "Your Username: #{username}"
@@ -231,6 +211,7 @@ when 1
     when "Change Name"
       changed_name = prompt.ask('What would you like to change you name to:')
       user.name = changed_name
+      user.save
       puts "Your name has been successfully changed."
     when "Delete Account"
       delete_account = prompt.select("Are you sure you want to delete your account?", %w(Yes No))
